@@ -41,6 +41,7 @@ const presetsContainer  = $('presets');
 const customsContainer  = $('customs');
 const divider           = $('divider');
 const fullscreen        = $('fullscreen');
+const fullscreenColor   = $('fullscreenColor');
 const brightnessOverlay = $('brightnessOverlay');
 const brightnessSlider  = $('brightnessSlider');
 const brightnessValue   = $('brightnessValue');
@@ -222,7 +223,7 @@ function enterFullscreen(hex) {
   brightness   = 100;
 
   // Configure full-screen view
-  fullscreen.style.backgroundColor = hex;
+  fullscreenColor.style.backgroundColor = hex;
   brightnessSlider.value = brightness;
   brightnessValue.textContent = brightness + '%';
 
@@ -246,6 +247,10 @@ function exitFullscreen() {
 
   // Clean up timers
   clearTimers();
+
+  // Reset brightness filter for next use
+  fullscreenColor.style.filter = '';
+  fullscreenColor.style.backgroundColor = '';
 
   // Swap views
   fullscreen.hidden = true;
@@ -285,7 +290,7 @@ function exitNativeFullscreen() {
 // ------------------------------------------------------------------
 function updateFullscreenBrightness() {
   const val = brightness / 100; // 0.05 – 2.0
-  fullscreen.style.filter = `brightness(${val})`;
+  fullscreenColor.style.filter = `brightness(${val})`;
 }
 
 function showBrightnessOverlay() {
