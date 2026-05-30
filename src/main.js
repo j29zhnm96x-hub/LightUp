@@ -46,6 +46,7 @@ const brightnessOverlay = $('brightnessOverlay');
 const brightnessSlider  = $('brightnessSlider');
 const brightnessValue   = $('brightnessValue');
 const btnAdd            = $('btnAdd');
+const colorPicker       = $('colorPicker');
 const mainEl            = $('main');
 
 // ------------------------------------------------------------------
@@ -183,35 +184,32 @@ function deleteColor(hex, swatchEl) {
 // Add color (native picker)
 // ------------------------------------------------------------------
 function addColor() {
-  const input = document.createElement('input');
-  input.type = 'color';
-  input.value = '#808080';
+  // Reset picker to a neutral default each time
+  colorPicker.value = '#808080';
 
-  input.addEventListener('input', () => {
-    // Live preview could go here, but we wait for confirm
-  });
+  // Remove old listener to avoid stacking duplicates
+  colorPicker.onchange = null;
 
-  input.addEventListener('change', () => {
-    const hex = input.value.toLowerCase();
+  colorPicker.addEventListener('change', function onPick() {
+    colorPicker.removeEventListener('change', onPick);
+
+    const hex = colorPicker.value.toLowerCase();
 
     // Avoid duplicates
     const allHexes = [...PRESETS.map((p) => p.hex), ...customColors];
-    if (allHexes.includes(hex)) {
-      // Color already exists — silently ignore or provide feedback
-      return;
-    }
+    if (allHexes.includes(hex)) return;
 
     customColors.push(hex);
     saveCustomColors();
     renderCustomColors();
 
-    // Auto-scroll to bottom so new color is visible
+    // Auto-scroll so new color is visible
     setTimeout(() => {
       mainEl.scrollTop = mainEl.scrollHeight;
     }, 50);
   });
 
-  input.click();
+  colorPicker.click();
 }
 
 // ------------------------------------------------------------------
@@ -359,6 +357,16 @@ function bindEvents() {
   // Brightness slider
   brightnessSlider.addEventListener('input', () => {
     brightness = parseInt(brightnessSlider.value, 10);
+    brightnessValue.textContent = brightness + '%';
+    updateFullscreenBrightness();
+    resetHideSliderTimer();
+  });
+
+  // Double-tap slider → reset to middle (100 / 100%)
+  brightnessSlider.addEventListener('dblclick', (e) => {
+    e.stopPropagation();    // don't bubble up to fullscreen's double-tap
+    brightness = 100;
+    brightnessSlider.value = brightness;
     brightnessValue.textContent = brightness + '%';
     updateFullscreenBrightness();
     resetHideSliderTimer();
