@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Light4Me</title>
+
+  <!-- iOS PWA hints -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Light4Me" />
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon.png" />
+
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ====== PALETTE VIEW ====== -->
+  <div id="app" class="app">
+    <header class="topbar" role="banner">
+      <h1 class="topbar__title">Light4Me</h1>
+      <button class="topbar__add" id="btnAdd" type="button" aria-label="Add custom color">+</button>
+    </header>
+
+    <main id="main" class="main" tabindex="-1" role="main">
+      <section class="palette" aria-label="Color palette">
+        <div id="presets" class="swatch-grid"></div>
+        <hr class="divider" id="divider" hidden />
+        <div id="customs" class="swatch-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ====== FULL-SCREEN VIEW ====== -->
+  <div id="fullscreen" class="fullscreen" hidden role="application" aria-label="Full screen color">
+    <div class="fullscreen__brightness" id="brightnessOverlay">
+      <div class="fullscreen__slider-track">
+        <span class="fullscreen__icon" aria-hidden="true">&#9681;</span>
+        <input type="range" class="fullscreen__slider" id="brightnessSlider"
+               min="5" max="200" value="100" step="1"
+               aria-label="Brightness" />
+        <span class="fullscreen__icon" aria-hidden="true">&#9728;</span>
+      </div>
+      <span class="fullscreen__label" id="brightnessValue">100%</span>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
