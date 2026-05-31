@@ -25,7 +25,10 @@
   <div id="app" class="app">
     <header class="topbar" role="banner">
       <h1 class="topbar__title">Light4Me</h1>
-      <label class="topbar__add" for="colorPicker" aria-label="Add custom color" role="button">+</label>
+      <div class="topbar__add-wrap">
+        <span class="topbar__add" aria-hidden="true">+</span>
+        <input type="color" id="colorPicker" value="#808080" class="topbar__color-input" />
+      </div>
     </header>
 
     <main id="main" class="main" tabindex="-1" role="main">
@@ -52,8 +55,8 @@
     </div>
   </div>
 
-  <!-- Hidden native color picker (must be in DOM for mobile Safari) -->
-  <input type="color" id="colorPicker" value="#808080" hidden />
+  <!-- Color picker: kept in DOM via CSS (not hidden attr — iOS Safari needs it accessible) -->
+  <input type="color" id="colorPicker" value="#808080" class="color-picker-hidden" />
 
   <script type="module" src="./src/main.js"></script>
 </body>
