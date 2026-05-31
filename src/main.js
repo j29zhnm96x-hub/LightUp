@@ -145,11 +145,27 @@ function renderPresets() {
 }
 
 function renderCustomColors() {
+  // Safety: if the in-memory array is empty, try reloading from localStorage
+  // in case it was accidentally cleared in memory (data may still be stored).
+  if (customColors.length === 0) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          customColors = parsed;
+        }
+      }
+    } catch { /* localStorage unavailable */ }
+  }
+
   customsContainer.innerHTML = '';
+
   if (customColors.length === 0) {
     divider.hidden = true;
     return;
   }
+
   divider.hidden = false;
   for (const hex of customColors) {
     customsContainer.appendChild(createSwatchElement(hex, false));
