@@ -25,9 +25,12 @@
   <div id="app" class="app">
     <header class="topbar" role="banner">
       <h1 class="topbar__title">Light4Me</h1>
-      <div class="topbar__add-wrap">
-        <span class="topbar__add" aria-hidden="true">+</span>
-        <input type="color" id="colorPicker" value="#808080" class="topbar__color-input" />
+      <div class="topbar__actions">
+        <div class="topbar__add-wrap">
+          <span class="topbar__add" aria-hidden="true">+</span>
+          <input type="color" id="colorPicker" value="#808080" class="topbar__color-input" />
+        </div>
+        <button class="topbar__cycle-btn" id="cycleBtn" type="button" aria-label="Cycle mode">&#10227;</button>
       </div>
     </header>
 
@@ -36,14 +39,46 @@
         <div id="presets" class="swatch-grid"></div>
         <hr class="divider" id="divider" hidden />
         <div id="customs" class="swatch-grid"></div>
+        <hr class="divider" id="presetCycleDivider" hidden />
+        <div id="presetCycles" class="preset-cycles"></div>
       </section>
     </main>
+
+    <!-- Cycle Selector Bar -->
+    <div class="cycle-selector" id="cycleSelector" hidden>
+      <div class="cycle-selector__preview" id="cyclePreview">
+        <span class="cycle-selector__hint" id="cycleHint">Select 2+ colors</span>
+      </div>
+      <div class="cycle-selector__bottom">
+        <div class="cycle-selector__time-group">
+          <input type="number" class="cycle-selector__time" id="cycleTimeInput"
+                 min="1" max="3600" value="10" step="1" />
+          <span class="cycle-selector__unit">s</span>
+        </div>
+        <div class="cycle-selector__btns">
+          <button class="cycle-selector__play" id="cyclePlayBtn" disabled>&#9654;</button>
+          <button class="cycle-selector__save" id="cycleSaveBtn" disabled>Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ====== FULL-SCREEN VIEW ====== -->
   <div id="fullscreen" class="fullscreen" hidden role="application" aria-label="Full screen color">
     <div class="fullscreen__color" id="fullscreenColor"></div>
+
+    <!-- Cycle status bar (thin, always visible during cycling) -->
+    <div class="fullscreen__cycle-status" id="cycleStatusBar" hidden>
+      <span id="cycleStatusLabel">Cycling</span>
+    </div>
+
+    <!-- Bottom controls (shown on single tap) -->
     <div class="fullscreen__brightness" id="brightnessOverlay">
+      <div class="fullscreen__cycle-controls" id="cycleControls" hidden>
+        <button class="fullscreen__ctrl-btn" id="cycleToggleBtn" aria-label="Pause cycle">&#9208;</button>
+        <span class="fullscreen__ctrl-label" id="cycleTimeDisplay">10s</span>
+        <button class="fullscreen__ctrl-btn" id="cycleExitBtn" aria-label="Exit cycle">&#10005;</button>
+      </div>
       <div class="fullscreen__slider-track">
         <span class="fullscreen__icon" aria-hidden="true">&#9681;</span>
         <input type="range" class="fullscreen__slider" id="brightnessSlider"
@@ -54,9 +89,6 @@
       <span class="fullscreen__label" id="brightnessValue">100%</span>
     </div>
   </div>
-
-  <!-- Color picker: kept in DOM via CSS (not hidden attr — iOS Safari needs it accessible) -->
-  <input type="color" id="colorPicker" value="#808080" class="color-picker-hidden" />
 
   <script type="module" src="./src/main.js"></script>
 </body>

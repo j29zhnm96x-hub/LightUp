@@ -80,12 +80,17 @@ button {
   letter-spacing: -0.3px;
 }
 
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .topbar__add {
-  /* + text styling only — container moved to .topbar__add-wrap */
   font-size: 28px;
   font-weight: 300;
   line-height: 1;
-  pointer-events: none;    /* let taps through to the color input underneath */
+  pointer-events: none;
 }
 
 .topbar__add-wrap {
@@ -111,6 +116,27 @@ button {
   padding: 0;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.topbar__cycle-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  transition: background 0.15s;
+  line-height: 1;
+}
+.topbar__cycle-btn:active {
+  background: var(--surface-hover);
+}
+.topbar__cycle-btn--active {
+  background: var(--surface-hover);
+  outline: 2px solid var(--text-muted);
+  outline-offset: -2px;
 }
 
 /* ====== Main Scroll Area ====== */
@@ -199,6 +225,7 @@ button {
 .fullscreen__color {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   /* background-color set by JS */
 }
 
@@ -285,6 +312,255 @@ button {
   color: var(--text);
   letter-spacing: 0.5px;
   font-variant-numeric: tabular-nums;
+}
+
+/* ====== Cycle Selector Bar ====== */
+.cycle-selector {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + var(--safe-b));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cycle-selector__preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  flex-wrap: wrap;
+}
+
+.cycle-selector__hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.cycle-selector__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cycle-selector__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cycle-selector__time-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cycle-selector__time {
+  width: 64px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.cycle-selector__time::-webkit-outer-spin-button,
+.cycle-selector__time::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cycle-selector__time:focus {
+  outline: 2px solid var(--text-muted);
+  outline-offset: -1px;
+}
+
+.cycle-selector__unit {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.cycle-selector__btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cycle-selector__play {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-radius: var(--radius-full);
+  background: #2979ff;
+  color: #fff;
+  transition: background 0.15s, opacity 0.15s;
+  line-height: 1;
+}
+.cycle-selector__play:active {
+  background: #1c5bbf;
+}
+.cycle-selector__play:disabled {
+  opacity: 0.35;
+}
+
+.cycle-selector__save {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  transition: background 0.15s, opacity 0.15s;
+}
+.cycle-selector__save:active {
+  background: var(--border);
+}
+.cycle-selector__save:disabled {
+  opacity: 0.35;
+}
+
+/* ====== Swatch: selected state (cycle-select mode) ====== */
+.swatch--selected {
+  background: rgba(41, 121, 255, 0.15);
+  outline: 2px solid #2979ff;
+  outline-offset: -2px;
+}
+
+.swatch--cycle-mode {
+  /* subtle indicator that tapping selects, not enters fullscreen */
+}
+.swatch--cycle-mode .swatch__color {
+  cursor: pointer;
+}
+
+/* ====== Cycle Status Bar (fullscreen) ====== */
+.fullscreen__cycle-status {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 210;
+  padding: 8px 16px;
+  padding-top: calc(8px + var(--safe-t));
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+/* ====== Cycle Controls (inside brightness overlay) ====== */
+.fullscreen__cycle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  padding-bottom: 4px;
+}
+
+.fullscreen__ctrl-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.fullscreen__ctrl-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fullscreen__ctrl-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ====== Cycle Presets ====== */
+.preset-cycles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.preset-cycle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.preset-cycle:active {
+  background: var(--surface-hover);
+}
+
+.preset-cycle__dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.preset-cycle__dot {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+}
+
+.preset-cycle__name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-cycle__delete {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.preset-cycle__delete:active {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
 }
 
 /* ====== Utility ====== */
