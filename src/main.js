@@ -8,14 +8,15 @@
 // Presets (pinned — never deletable)
 // ------------------------------------------------------------------
 const PRESETS = [
-  { hex: '#ffffff', label: 'White' },
-  { hex: '#fff8e1', label: 'Warm White' },
-  { hex: '#ff1744', label: 'Red' },
-  { hex: '#00e676', label: 'Green' },
-  { hex: '#2979ff', label: 'Blue' },
-  { hex: '#ffab00', label: 'Amber' },
-  { hex: '#d500f9', label: 'Purple' },
-  { hex: '#00e5ff', label: 'Cyan' },
+  { hex: '#ffffff',  label: 'White' },
+  { hex: '#ff1744',  label: 'Red' },
+  { hex: '#ff6d00',  label: 'Orange' },
+  { hex: '#ffab00',  label: 'Amber' },
+  { hex: '#00e676',  label: 'Green' },
+  { hex: '#00e5ff',  label: 'Cyan' },
+  { hex: '#2979ff',  label: 'Blue' },
+  { hex: '#d500f9',  label: 'Purple' },
+  { hex: '#e91e63',  label: 'Pink' },
 ];
 
 // ------------------------------------------------------------------
@@ -103,7 +104,12 @@ function loadCustomColors() {
 }
 
 function saveCustomColors() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(customColors));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(customColors));
+  } catch (e) {
+    // localStorage may be full or unavailable — keep data in memory
+    console.warn('Light4Me: could not save custom colors', e.message);
+  }
 }
 
 function loadCyclePresets() {
@@ -115,7 +121,11 @@ function loadCyclePresets() {
 }
 
 function saveCyclePresets() {
-  localStorage.setItem(PRESETS_KEY, JSON.stringify(cyclePresets));
+  try {
+    localStorage.setItem(PRESETS_KEY, JSON.stringify(cyclePresets));
+  } catch (e) {
+    console.warn('Light4Me: could not save cycle presets', e.message);
+  }
 }
 
 // ------------------------------------------------------------------
