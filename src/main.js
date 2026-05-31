@@ -45,6 +45,7 @@ let cyclePresets = [];
 let tapTimer        = null;
 let hideSliderTimer = null;
 let longPressTimer  = null;
+let wakeLockSentinel = null;
 
 // ------------------------------------------------------------------
 // DOM references
@@ -443,6 +444,7 @@ function startCycle() {
   cycleRAF = requestAnimationFrame(cycleFrame);
 
   tryNativeFullscreen();
+  requestWakeLock();
 }
 
 // ------------------------------------------------------------------
@@ -581,6 +583,7 @@ function enterFullscreen(hex) {
   brightnessOverlay.classList.remove('visible');
 
   tryNativeFullscreen();
+  requestWakeLock();
 }
 
 // ------------------------------------------------------------------
@@ -615,6 +618,7 @@ function exitFullscreen() {
   app.hidden = false;
 
   exitNativeFullscreen();
+  releaseWakeLock();
 
   // If we were cycling, re-enter cycle-select mode with colors loaded
   // so the user can save the preset or tweak and play again
@@ -637,6 +641,33 @@ function exitFullscreen() {
     });
   }
 }
+
+// ------------------------------------------------------------------
+// Wake Lock (prevents screen from dimming / locking)
+// ------------------------------------------------------------------
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator && wakeLockSentinel === null) {
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      // Re-request if the page regains visibility (iOS may release on tab switch)
+      wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; });
+    }
+  } catch { /* not supported or denied — screen may still lock */ }
+}
+
+function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    try { wakeLockSentinel.release(); } catch { /* ignore */ }
+    wakeLockSentinel = null;
+  }
+}
+
+// Re-acquire wake lock when page becomes visible again
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && isFullscreen && wakeLockSentinel === null) {
+    requestWakeLock();
+  }
+});
 
 // ------------------------------------------------------------------
 // Native fullscreen API
