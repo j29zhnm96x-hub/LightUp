@@ -45,7 +45,6 @@ const fullscreenColor   = $('fullscreenColor');
 const brightnessOverlay = $('brightnessOverlay');
 const brightnessSlider  = $('brightnessSlider');
 const brightnessValue   = $('brightnessValue');
-const btnAdd            = $('btnAdd');
 const colorPicker       = $('colorPicker');
 const mainEl            = $('main');
 
@@ -181,35 +180,23 @@ function deleteColor(hex, swatchEl) {
 }
 
 // ------------------------------------------------------------------
-// Add color (native picker)
+// Add color (native picker via label for="colorPicker")
 // ------------------------------------------------------------------
-function addColor() {
-  // Reset picker to a neutral default each time
-  colorPicker.value = '#808080';
+function onColorPicked() {
+  const hex = colorPicker.value.toLowerCase();
 
-  // Remove old listener to avoid stacking duplicates
-  colorPicker.onchange = null;
+  // Avoid duplicates
+  const allHexes = [...PRESETS.map((p) => p.hex), ...customColors];
+  if (allHexes.includes(hex)) return;
 
-  colorPicker.addEventListener('change', function onPick() {
-    colorPicker.removeEventListener('change', onPick);
+  customColors.push(hex);
+  saveCustomColors();
+  renderCustomColors();
 
-    const hex = colorPicker.value.toLowerCase();
-
-    // Avoid duplicates
-    const allHexes = [...PRESETS.map((p) => p.hex), ...customColors];
-    if (allHexes.includes(hex)) return;
-
-    customColors.push(hex);
-    saveCustomColors();
-    renderCustomColors();
-
-    // Auto-scroll so new color is visible
-    setTimeout(() => {
-      mainEl.scrollTop = mainEl.scrollHeight;
-    }, 50);
-  });
-
-  colorPicker.click();
+  // Auto-scroll so new color is visible
+  setTimeout(() => {
+    mainEl.scrollTop = mainEl.scrollHeight;
+  }, 50);
 }
 
 // ------------------------------------------------------------------
@@ -345,7 +332,8 @@ function handleFullscreenPointer() {
 // Event binding
 // ------------------------------------------------------------------
 function bindEvents() {
-  btnAdd.addEventListener('click', addColor);
+  // Color picker: label for="colorPicker" opens it natively on tap
+  colorPicker.addEventListener('change', onColorPicked);
 
   // Full-screen interactions
   fullscreen.addEventListener('click', (e) => {
