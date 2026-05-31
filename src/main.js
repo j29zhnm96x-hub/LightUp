@@ -180,12 +180,11 @@ function deleteColor(hex, swatchEl) {
 }
 
 // ------------------------------------------------------------------
-// Add color (native picker via label for="colorPicker")
+// Add color (native picker overlay on + button)
 // ------------------------------------------------------------------
-function onColorPicked() {
-  const hex = colorPicker.value.toLowerCase();
+let colorBeforePick = null;
 
-  // Avoid duplicates
+function commitCustomColor(hex) {
   const allHexes = [...PRESETS.map((p) => p.hex), ...customColors];
   if (allHexes.includes(hex)) return;
 
@@ -193,7 +192,6 @@ function onColorPicked() {
   saveCustomColors();
   renderCustomColors();
 
-  // Auto-scroll so new color is visible
   setTimeout(() => {
     mainEl.scrollTop = mainEl.scrollHeight;
   }, 50);
@@ -332,8 +330,20 @@ function handleFullscreenPointer() {
 // Event binding
 // ------------------------------------------------------------------
 function bindEvents() {
-  // Color picker: label for="colorPicker" opens it natively on tap
-  colorPicker.addEventListener('change', onColorPicked);
+  // Color picker: only commit on blur (picker dismissed),
+  // not on intermediate changes (iOS fires change per tap in the picker grid)
+  colorPicker.addEventListener('focus', () => {
+    colorBeforePick = colorPicker.value;
+  });
+  colorPicker.addEventListener('blur', () => {
+    if (colorBeforePick !== null) {
+      const picked = colorPicker.value;
+      colorBeforePick = null;
+      if (picked !== colorBeforePick) {
+        commitCustomColor(picked.toLowerCase());
+      }
+    }
+  });
 
   // Full-screen interactions
   fullscreen.addEventListener('click', (e) => {
