@@ -29,12 +29,13 @@ let brightness    = 100;
 // Cycle state
 let isCycleSelect = false;
 let cycleColors   = [];
-let cycleTime     = 10;        // total cycle seconds
+let cycleTime     = 10;
 let isCycling     = false;
 let cyclePaused   = false;
 let cycleRAF      = null;
 let cycleStart    = 0;
 let pauseStart    = 0;
+let editingPresetIndex = -1;   // -1 = new, >= 0 = updating an existing preset
 
 // Cycle presets
 let cyclePresets = [];
@@ -69,8 +70,6 @@ const cycleHint        = $('cycleHint');
 const cycleTimeInput   = $('cycleTimeInput');
 const cyclePlayBtn     = $('cyclePlayBtn');
 const cycleSaveBtn     = $('cycleSaveBtn');
-const cycleStatusBar   = $('cycleStatusBar');
-const cycleStatusLabel = $('cycleStatusLabel');
 const cycleControls    = $('cycleControls');
 const cycleToggleBtn   = $('cycleToggleBtn');
 const cycleTimeDisplay = $('cycleTimeDisplay');
@@ -194,7 +193,7 @@ function renderCyclePresets() {
     row.appendChild(delBtn);
 
     row.addEventListener('click', () => {
-      loadCyclePreset(preset);
+      loadCyclePreset(i, preset);
     });
 
     presetCycles.appendChild(row);
@@ -302,10 +301,12 @@ function toggleCycleSelect() {
 
   if (isCycleSelect) {
     // Enter cycle-select mode
+    editingPresetIndex = -1;
     cycleBtn.classList.add('topbar__cycle-btn--active');
     cycleSelector.hidden = false;
     cycleColors = [];
     updateCycleSelector();
+    cycleSaveBtn.textContent = 'Save';
     // Mark all swatches with cycle-mode class
     document.querySelectorAll('.swatch').forEach((s) => {
       s.classList.add('swatch--cycle-mode');
@@ -406,23 +407,16 @@ function startCycle() {
   fullscreen.hidden = false;
   brightnessOverlay.classList.remove('visible');
 
-  // Show cycle UI
-  cycleStatusBar.hidden = false;
+  // Show cycle controls
   cycleControls.hidden = false;
   cycleToggleBtn.textContent = '\u23F8'; // pause
   cycleTimeDisplay.textContent = cycleTime + 's';
-  updateCycleStatusLabel();
 
   // Start animation
   cycleStart = performance.now();
   cycleRAF = requestAnimationFrame(cycleFrame);
 
   tryNativeFullscreen();
-}
-
-function updateCycleStatusLabel() {
-  const names = cycleColors.map((h) => h.toUpperCase());
-  cycleStatusLabel.textContent = 'Cycling: ' + names.join(' \u2192 ');
 }
 
 // ------------------------------------------------------------------
@@ -485,11 +479,24 @@ function toggleCyclePause() {
 }
 
 // ------------------------------------------------------------------
-// CYCLE: save preset
+// CYCLE: save / update preset
 // ------------------------------------------------------------------
 function saveCyclePreset() {
   if (cycleColors.length < 2) return;
 
+  if (editingPresetIndex >= 0 && cyclePresets[editingPresetIndex]) {
+    const current = cyclePresets[editingPresetIndex];
+    // Confirm: update existing or cancel to save as new
+    if (confirm('Update "' + current.name + '" preset or Cancel to save as new?')) {
+      current.colors = [...cycleColors];
+      saveCyclePresets();
+      renderCyclePresets();
+      editingPresetIndex = -1;
+      return;
+    }
+  }
+
+  // Save as new preset
   const name = prompt('Name this color cycle:', '');
   if (!name || !name.trim()) return;
 
@@ -499,25 +506,31 @@ function saveCyclePreset() {
     createdAt: Date.now()
   });
 
+  editingPresetIndex = -1;
   saveCyclePresets();
   renderCyclePresets();
 }
 
 function deleteCyclePreset(index) {
   cyclePresets.splice(index, 1);
+  if (editingPresetIndex === index) editingPresetIndex = -1;
+  else if (editingPresetIndex > index) editingPresetIndex--;
   saveCyclePresets();
   renderCyclePresets();
 }
 
-function loadCyclePreset(preset) {
+function loadCyclePreset(index, preset) {
   // Activate cycle-select mode with preset colors
   if (!isCycleSelect) {
     toggleCycleSelect();
   }
   cycleColors = [...preset.colors];
+  editingPresetIndex = index;
   updateCycleSelector();
 
-  // Scroll palette area into view
+  // Update Save button text to show we're editing
+  cycleSaveBtn.textContent = 'Save';
+  cycleSaveBtn.title = preset.name;
   mainEl.scrollTop = 0;
 }
 
@@ -569,8 +582,7 @@ function exitFullscreen() {
   fullscreenColor.style.filter = '';
   fullscreenColor.style.backgroundColor = '';
 
-  // Hide cycle UI
-  cycleStatusBar.hidden = true;
+  // Hide cycle controls
   cycleControls.hidden = true;
 
   fullscreen.hidden = true;

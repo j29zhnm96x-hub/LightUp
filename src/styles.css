@@ -443,26 +443,6 @@ button {
   cursor: pointer;
 }
 
-/* ====== Cycle Status Bar (fullscreen) ====== */
-.fullscreen__cycle-status {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 210;
-  padding: 8px 16px;
-  padding-top: calc(8px + var(--safe-t));
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  text-align: center;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
-  letter-spacing: 0.3px;
-  pointer-events: none;
-}
-
 /* ====== Cycle Controls (inside brightness overlay) ====== */
 .fullscreen__cycle-controls {
   display: flex;
