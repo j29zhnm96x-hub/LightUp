@@ -75,6 +75,7 @@ const cycleControls    = $('cycleControls');
 const cycleToggleBtn   = $('cycleToggleBtn');
 const cycleTimeDisplay = $('cycleTimeDisplay');
 const cycleExitBtn     = $('cycleExitBtn');
+const cycleSaveFsBtn   = $('cycleSaveFsBtn');
 const presetCycleDiv   = $('presetCycleDivider');
 const presetCycles     = $('presetCycles');
 
@@ -436,7 +437,8 @@ function cycleFrame(timestamp) {
   }
 
   const n = cycleColors.length;
-  const elapsed = (timestamp - cycleStart) / 1000; // seconds
+  if (n < 2) { cycleRAF = requestAnimationFrame(cycleFrame); return; }
+  const elapsed = (timestamp - cycleStart) / 1000;
   const phase = elapsed % cycleTime;
   const segDuration = cycleTime / n;
   const segIndex = Math.floor(phase / segDuration);
@@ -444,6 +446,7 @@ function cycleFrame(timestamp) {
 
   const fromHex = cycleColors[segIndex];
   const toHex   = cycleColors[(segIndex + 1) % n];
+  if (!fromHex || !toHex) { cycleRAF = requestAnimationFrame(cycleFrame); return; }
   const rgb = lerpColor(fromHex, toHex, segProgress);
 
   fullscreenColor.style.backgroundColor = rgb;
@@ -545,6 +548,11 @@ function enterFullscreen(hex) {
 // Full-screen exit
 // ------------------------------------------------------------------
 function exitFullscreen() {
+  // Remember cycle state before clearing
+  const wasCycling = isCycling;
+  const savedColors = cycleColors.length > 0 ? cycleColors.slice() : null;
+  const savedTime = cycleTime;
+
   // Stop cycling
   isCycling = false;
   cyclePaused = false;
@@ -569,6 +577,27 @@ function exitFullscreen() {
   app.hidden = false;
 
   exitNativeFullscreen();
+
+  // If we were cycling, re-enter cycle-select mode with colors loaded
+  // so the user can save the preset or tweak and play again
+  if (wasCycling && savedColors && savedColors.length >= 2) {
+    cycleColors = savedColors;
+    cycleTimeInput.value = savedTime;
+
+    isCycleSelect = true;
+    cycleBtn.classList.add('topbar__cycle-btn--active');
+    cycleSelector.hidden = false;
+
+    updateCycleSelector();
+
+    document.querySelectorAll('.swatch').forEach((s) => {
+      s.classList.add('swatch--cycle-mode');
+      const hex = s.dataset.hex;
+      if (cycleColors.includes(hex)) {
+        s.classList.add('swatch--selected');
+      }
+    });
+  }
 }
 
 // ------------------------------------------------------------------
@@ -718,6 +747,19 @@ function bindEvents() {
   cycleExitBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     exitFullscreen();
+  });
+
+  // Cycle save from fullscreen
+  cycleSaveFsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const colors = cycleColors.slice();
+    if (colors.length < 2) return;
+    const name = prompt('Name this color cycle:', '');
+    if (!name || !name.trim()) return;
+    cyclePresets.push({ name: name.trim(), colors, createdAt: Date.now() });
+    saveCyclePresets();
+    renderCyclePresets();
+    resetHideSliderTimer();
   });
 
   // Escape key
